@@ -1,4 +1,4 @@
-package bufferbci
+package gobci
 
 import (
 	"encoding/binary"

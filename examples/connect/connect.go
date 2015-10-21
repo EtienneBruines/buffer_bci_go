@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/EtienneBruines/go_buffer_bci_client/bufferbci"
+	"github.com/EtienneBruines/gobci"
 
 	"github.com/gonum/plot"
 	"github.com/gonum/plot/plotter"
@@ -15,27 +15,28 @@ func main() {
 	// Connecting
 	log.Println("Trying to connect to localhost:1972 ...")
 
-	conn, err := bufferbci.Connect("localhost:1972")
+	conn, err := gobci.Connect("localhost:1972")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer conn.Close()
 
-	log.Println("Connection established")
-
 	// Getting header information
+	log.Println("Requesting header data ...")
+
 	header, err := conn.GetHeader()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// Getting samples
+	log.Println("Requesting sample data ...")
+
 	var amountOfSamples uint32 = 100
 	if header.NSamples < amountOfSamples {
 		log.Fatal("Not enough samples avialable")
 	}
 
-	log.Println("Requesting data ...")
 	samples, err := conn.GetData(0, 0)
 	if err != nil {
 		log.Fatal(err)
@@ -49,7 +50,7 @@ func main() {
 		}
 	}
 
-	log.Println("Plotting ...")
+	log.Println("Plotting samples ...")
 	plt, err := plot.New()
 	plotutil.AddLinePoints(plt,
 		"CH0", plotter.XYer(channels[0]),
@@ -58,6 +59,8 @@ func main() {
 
 	log.Println("Saving plot to output.jpg ...")
 	plt.Save(10*vg.Inch, 5*vg.Inch, "output.jpg")
+
+	log.Println("Done")
 }
 
 type channelXYer struct {
