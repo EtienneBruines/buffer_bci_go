@@ -6,9 +6,13 @@ import (
 	"net/textproto"
 )
 
+const (
+	DefaultHost = "localhost:1972"
+)
+
 var (
 	ConnType  = "tcp"
-	ByteOrder = binary.LittleEndian
+	ByteOrder = binary.BigEndian
 )
 
 type Connection struct {
@@ -16,7 +20,13 @@ type Connection struct {
 	textConnection *textproto.Conn
 }
 
+// Connect attempts a connection to the Buffer Server at given host
+// Host can be in the format of "localhost:1972", and may be empty to use the default hostname.
 func Connect(host string) (*Connection, error) {
+	if len(host) == 0 {
+		host = DefaultHost
+	}
+
 	tcpaddr, err := net.ResolveTCPAddr(ConnType, host)
 	if err != nil {
 		return nil, err
@@ -76,6 +86,7 @@ func (c *Connection) readMessageDefinition() (*messageDefinition, error) {
 	return def, nil
 }
 
+// Close closes the TCP connection with the host
 func (c *Connection) Close() error {
 	return c.textConnection.Close()
 }
@@ -92,6 +103,20 @@ const (
 	CommandGetErr uint16 = 0x205
 )
 
+const (
+	DataTypeChar uint32 = iota
+	DataTypeUint8
+	DataTypeUint16
+	DataTypeuint32
+	DataTypeUint64
+	DataTypeInt8
+	DataTypeInt16
+	DataTypeInt32
+	DataTypeInt64
+	DataTypeFloat32
+	DataTypeFloat64
+)
+
 type messageDefinition struct {
 	Version uint16
 	Cmd     uint16
@@ -99,12 +124,12 @@ type messageDefinition struct {
 }
 
 type Header struct {
-	nchans    uint32  // number of channels
-	nsamples  uint32  // number of samples, must be 0 for PUT_HDR
-	nevents   uint32  // number of events, must be 0 for PUT_HDR
-	fsamp     float32 // sampling frequency (Hz)
-	data_type uint32  // type of the sample data (see table above)
-	bufsize   uint32  // size of remaining parts of the message in bytes (total size of all chunks)
+	NChannels         uint32  // number of channels
+	NSamples          uint32  // number of samples, must be 0 for PUT_HDR
+	NEvents           uint32  // number of events, must be 0 for PUT_HDR
+	SamplingFrequency float32 // sampling frequency (Hz)
+	data_type         uint32  // type of the sample data (see table above)
+	bufsize           uint32  // size of remaining parts of the message in bytes (total size of all chunks)
 
 	chunks []HeaderChunk
 }

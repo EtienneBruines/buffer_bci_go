@@ -8,22 +8,22 @@ func (c *Connection) putHeader(nChannels uint32, fSamp float32) error {
 
 	h := Header{nChannels, 0, 0, fSamp, 0, 0, nil}
 
-	err = binary.Write(c.textConnection.W, ByteOrder, h.nchans)
+	err = binary.Write(c.textConnection.W, ByteOrder, h.NChannels)
 	if err != nil {
 		return err
 	}
 
-	err = binary.Write(c.textConnection.W, ByteOrder, h.nsamples)
+	err = binary.Write(c.textConnection.W, ByteOrder, h.NSamples)
 	if err != nil {
 		return err
 	}
 
-	err = binary.Write(c.textConnection.W, ByteOrder, h.nevents)
+	err = binary.Write(c.textConnection.W, ByteOrder, h.NEvents)
 	if err != nil {
 		return err
 	}
 
-	err = binary.Write(c.textConnection.W, ByteOrder, h.fsamp)
+	err = binary.Write(c.textConnection.W, ByteOrder, h.SamplingFrequency)
 	if err != nil {
 		return err
 	}
