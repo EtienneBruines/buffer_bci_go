@@ -17,10 +17,10 @@ func main() {
 
 	log.Println("Connection established")
 
-	response, err := conn.SendDebugCommand()
+	header, err := conn.GetHeader()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Println("Response:", response)
+	log.Println("Header:", header)
 }
