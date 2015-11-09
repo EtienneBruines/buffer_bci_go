@@ -101,6 +101,9 @@ const (
 	CommandGetDat uint16 = 0x202
 	CommandGetOk  uint16 = 0x204
 	CommandGetErr uint16 = 0x205
+
+	CommandWaitDat uint16 = 0x402
+	CommandWaitOk  uint16 = 0x404
 )
 
 const (

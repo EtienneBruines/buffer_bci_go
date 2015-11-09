@@ -240,3 +240,56 @@ func (c *Connection) GetData(begin, end uint32) ([][]float64, error) {
 
 	return samples, nil
 }
+
+func (c *Connection) WaitData(nSamples, nEvents, timeout uint32) (uint32, uint32, error) {
+	def := &messageDefinition{1, CommandWaitDat, 12}
+	err := c.sendMessageDefinition(def)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	err = binary.Write(c.textConnection.W, ByteOrder, nSamples)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	err = binary.Write(c.textConnection.W, ByteOrder, nEvents)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	err = binary.Write(c.textConnection.W, ByteOrder, timeout)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	err = c.textConnection.W.Flush()
+	if err != nil {
+		return 0, 0, err
+	}
+
+	resp, err := c.readMessageDefinition()
+	if err != nil {
+		return 0, 0, err
+	}
+	if resp.Cmd != CommandWaitOk {
+		return 0, 0, fmt.Errorf("expected WAIT_OK (0x404), but received (%#x)", resp.Cmd)
+	}
+
+	var sampleCount uint32
+	var eventCount uint32
+
+	if resp.Bufsize == 8 {
+		err = binary.Read(c.textConnection.R, ByteOrder, &sampleCount)
+		if err != nil {
+			return 0, 0, err
+		}
+
+		err = binary.Read(c.textConnection.R, ByteOrder, &eventCount)
+		if err != nil {
+			return 0, 0, err
+		}
+	}
+
+	return sampleCount, eventCount, nil
+}
