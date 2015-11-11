@@ -102,8 +102,13 @@ const (
 	CommandGetOk  uint16 = 0x204
 	CommandGetErr uint16 = 0x205
 
+	CommandFlushDat uint16 = 0x302
+	CommandFlushOk  uint16 = 0x304
+	CommandFlushErr uint16 = 0x305
+
 	CommandWaitDat uint16 = 0x402
 	CommandWaitOk  uint16 = 0x404
+	CommandWaitErr uint16 = 0x405
 )
 
 const (

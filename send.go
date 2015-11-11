@@ -1,6 +1,9 @@
 package gobci
 
-import "encoding/binary"
+import (
+	"encoding/binary"
+	"fmt"
+)
 
 func (c *Connection) putHeader(nChannels uint32, fSamp float32) error {
 	def := &messageDefinition{1, CommandPutHdr, 24}
@@ -43,4 +46,28 @@ func (c *Connection) putHeader(nChannels uint32, fSamp float32) error {
 	}
 
 	return c.textConnection.W.Flush()
+}
+
+func (c *Connection) FlushData() error {
+	def := &messageDefinition{1, CommandFlushDat, 0}
+	err := c.sendMessageDefinition(def)
+	if err != nil {
+		return err
+	}
+
+	err = c.textConnection.W.Flush()
+	if err != nil {
+		return err
+	}
+
+	resp, err := c.readMessageDefinition()
+	if err != nil {
+		return err
+	}
+
+	if resp.Cmd != CommandFlushOk {
+		return fmt.Errorf("expected FLUSH_OK (0x304), but received %x", resp.Cmd)
+	}
+
+	return nil
 }
