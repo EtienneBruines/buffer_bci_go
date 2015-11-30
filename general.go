@@ -94,6 +94,7 @@ func (c *Connection) Close() error {
 const (
 	CommandPutHdr uint16 = 0x101
 	CommandPutDat uint16 = 0x102
+	CommandPutEvt uint16 = 0x103
 	CommandPutOk  uint16 = 0x104
 	CommandPutErr uint16 = 0x105
 
